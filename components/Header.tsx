@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { onSettingsChange } from "@/lib/settings";
+import { DEFAULT_SETTINGS, type PlatformSettings } from "@/types";
 
 function CoinIcon() {
   return (
@@ -16,11 +18,19 @@ function CoinIcon() {
   );
 }
 
-function LiveDot() {
+function LiveDot({ open }: { open: boolean }) {
   return (
     <span className="relative inline-flex h-2 w-2">
-      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-      <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+      <span
+        className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 ${
+          open ? "bg-emerald-400" : "bg-amber-400"
+        }`}
+      />
+      <span
+        className={`relative inline-flex h-2 w-2 rounded-full ${
+          open ? "bg-emerald-400" : "bg-amber-400"
+        }`}
+      />
     </span>
   );
 }
@@ -35,6 +45,14 @@ const navLinks = [
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [settings, setSettings] = useState<PlatformSettings>(DEFAULT_SETTINGS);
+
+  useEffect(() => {
+    const unsub = onSettingsChange(setSettings);
+    return () => unsub();
+  }, []);
+
+  const rateLabel = `1 ITL = ${settings.payoutRate} USDT`;
 
   return (
     <header className="sticky top-0 z-50 border-b border-neutral-800/70 bg-neutral-950/70 backdrop-blur-xl">
@@ -65,10 +83,8 @@ export default function Header() {
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Rate chip — desktop only */}
             <div className="hidden lg:flex chip !py-1.5 !text-sm">
-              <LiveDot />
-              <span className="font-medium text-neutral-200">
-                1 ITL <span className="text-neutral-500">=</span> 2 USDT
-              </span>
+              <LiveDot open={settings.redemptionOpen} />
+              <span className="font-medium text-neutral-200">{rateLabel}</span>
             </div>
             <a
               href="#redeem"
@@ -124,9 +140,9 @@ export default function Header() {
             </a>
           ))}
           <div className="mt-2 flex items-center gap-2 rounded-xl bg-neutral-900/60 px-4 py-3">
-            <LiveDot />
+            <LiveDot open={settings.redemptionOpen} />
             <span className="text-sm font-medium text-neutral-200">
-              1 ITL <span className="text-neutral-500">=</span> 2 USDT
+              {rateLabel}
             </span>
           </div>
         </nav>

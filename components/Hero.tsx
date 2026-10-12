@@ -1,13 +1,38 @@
-function LiveBadge() {
+"use client";
+
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { onSettingsChange } from "@/lib/settings";
+import { DEFAULT_SETTINGS, type PlatformSettings } from "@/types";
+
+function LiveBadge({ open }: { open: boolean }) {
   return (
     <div className="relative inline-flex items-center">
-      <div className="absolute -inset-1 rounded-full bg-brand-500/20 blur-md" />
-      <div className="relative inline-flex items-center gap-2 rounded-full border border-brand-500/40 bg-brand-500/10 px-4 py-1.5 text-xs sm:text-sm font-medium text-brand-200">
+      <div
+        className={`absolute -inset-1 rounded-full blur-md ${
+          open ? "bg-emerald-500/20" : "bg-amber-500/20"
+        }`}
+      />
+      <div
+        className={`relative inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs sm:text-sm font-medium ${
+          open
+            ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-200"
+            : "border-amber-500/40 bg-amber-500/10 text-amber-200"
+        }`}
+      >
         <span className="relative inline-flex h-2 w-2">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-          <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+          <span
+            className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 ${
+              open ? "bg-emerald-400" : "bg-amber-400"
+            }`}
+          />
+          <span
+            className={`relative inline-flex h-2 w-2 rounded-full ${
+              open ? "bg-emerald-400" : "bg-amber-400"
+            }`}
+          />
         </span>
-        Redemption Open · Live Now
+        {open ? "Redemption Open · Live Now" : "Redemptions Temporarily Closed"}
       </div>
     </div>
   );
@@ -80,13 +105,20 @@ function TrustPills() {
 }
 
 export default function Hero() {
+  const [settings, setSettings] = useState<PlatformSettings>(DEFAULT_SETTINGS);
+
+  useEffect(() => {
+    const unsub = onSettingsChange(setSettings);
+    return () => unsub();
+  }, []);
+
   return (
     <section
       id="how-it-works"
       className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-14 sm:pt-20 pb-16 sm:pb-20"
     >
       <div className="flex flex-col items-center text-center gap-7 sm:gap-9">
-        <LiveBadge />
+        <LiveBadge open={settings.redemptionOpen} />
 
         <h1 className="max-w-5xl text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05]">
           <span className="text-white">Redeem your ITL,</span>
@@ -112,12 +144,12 @@ export default function Hero() {
               />
             </svg>
           </a>
-          <a
-            href="#how-it-works"
+          <Link
+            href="/wallet"
             className="btn-secondary w-full sm:w-auto !px-7 !py-4 text-base justify-center"
           >
-            How it works
-          </a>
+            Wallet activation
+          </Link>
         </div>
 
         <TrustPills />

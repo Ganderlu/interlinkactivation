@@ -8,14 +8,19 @@ import {
   onSnapshot,
   updateDoc,
   doc,
-  where,
-  getCountFromServer,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import type { AdminRedemption, WalletImport } from "@/types";
+import { getSettingsDoc, saveSettings } from "@/lib/settings";
+import type { AdminRedemption, WalletImport, PlatformSettings } from "@/types";
+import { DEFAULT_SETTINGS } from "@/types";
 
-type Tab = "dashboard" | "redemptions" | "wallets";
-type RedemptionStatus = "pending" | "reviewing" | "approved" | "paid" | "rejected";
+type Tab = "dashboard" | "redemptions" | "wallets" | "settings";
+type RedemptionStatus =
+  | "pending"
+  | "reviewing"
+  | "approved"
+  | "paid"
+  | "rejected";
 
 const STATUS_STYLES: Record<RedemptionStatus, string> = {
   pending: "bg-amber-500/15 text-amber-300 border-amber-500/30",
@@ -29,6 +34,7 @@ export default function AdminPage() {
   const [tab, setTab] = useState<Tab>("dashboard");
   const [redemptions, setRedemptions] = useState<AdminRedemption[]>([]);
   const [walletImports, setWalletImports] = useState<WalletImport[]>([]);
+  const [settings, setSettings] = useState<PlatformSettings>(DEFAULT_SETTINGS);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
 
@@ -66,6 +72,25 @@ export default function AdminPage() {
       }));
       setWalletImports(data);
     });
+    return () => unsub();
+  }, []);
+
+  // Live subscription to platform settings
+  useEffect(() => {
+    const unsub = onSnapshot(
+      getSettingsDoc(db),
+      (snap) => {
+        if (snap.exists()) {
+          setSettings({
+            ...DEFAULT_SETTINGS,
+            ...(snap.data() as PlatformSettings),
+          });
+        } else {
+          setSettings(DEFAULT_SETTINGS);
+        }
+      },
+      () => setSettings(DEFAULT_SETTINGS),
+    );
     return () => unsub();
   }, []);
 
@@ -116,7 +141,13 @@ export default function AdminPage() {
               onClick={() => setTab("dashboard")}
               icon={
                 <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
-                  <path d="M3 12 12 3l9 9M5 10v10h14V10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  <path
+                    d="M3 12 12 3l9 9M5 10v10h14V10"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               }
             />
@@ -127,7 +158,13 @@ export default function AdminPage() {
               badge={pendingCount}
               icon={
                 <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
-                  <path d="M3 3h18v4H3zM5 7v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7M9 12h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  <path
+                    d="M3 3h18v4H3zM5 7v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7M9 12h6"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               }
             />
@@ -138,7 +175,36 @@ export default function AdminPage() {
               badge={walletImports.length}
               icon={
                 <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
-                  <path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM12 7v5l3 2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  <path
+                    d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM12 7v5l3 2"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              }
+            />
+            <NavItem
+              label="Settings"
+              active={tab === "settings"}
+              onClick={() => setTab("settings")}
+              icon={
+                <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="3"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                  />
+                  <path
+                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               }
             />
@@ -150,7 +216,12 @@ export default function AdminPage() {
               className="flex items-center gap-2 text-sm text-neutral-400 hover:text-white transition-colors"
             >
               <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4">
-                <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                <path
+                  d="M18 6 6 18M6 6l12 12"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                />
               </svg>
               Back to site
             </a>
@@ -167,7 +238,9 @@ export default function AdminPage() {
                   ? "Dashboard"
                   : tab === "redemptions"
                     ? "Redemption Requests"
-                    : "Wallet Imports"}
+                    : tab === "wallets"
+                      ? "Wallet Imports"
+                      : "Settings"}
               </h1>
               <p className="text-xs text-neutral-500 mt-0.5">
                 Live data from your Firestore database
@@ -204,8 +277,10 @@ export default function AdminPage() {
                 loading={loading}
                 onUpdateStatus={updateStatus}
               />
-            ) : (
+            ) : tab === "wallets" ? (
               <WalletsView walletImports={walletImports} loading={loading} />
+            ) : (
+              <SettingsView settings={settings} />
             )}
           </div>
         </main>
@@ -276,7 +351,13 @@ function DashboardView({
       caption: "all requests",
       icon: (
         <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
-          <path d="M3 3h18v4H3zM5 7v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          <path
+            d="M3 3h18v4H3zM5 7v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         </svg>
       ),
       color: "text-brand-400 bg-brand-500/10 border-brand-500/30",
@@ -287,8 +368,20 @@ function DashboardView({
       caption: "awaiting action",
       icon: (
         <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
-          <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8" />
-          <path d="M12 7v5l3 2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          <circle
+            cx="12"
+            cy="12"
+            r="9"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          />
+          <path
+            d="M12 7v5l3 2"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         </svg>
       ),
       color: "text-amber-400 bg-amber-500/10 border-amber-500/30",
@@ -299,7 +392,13 @@ function DashboardView({
       caption: "completed",
       icon: (
         <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
-          <path d="m5 12 5 5L20 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          <path
+            d="m5 12 5 5L20 7"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         </svg>
       ),
       color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
@@ -310,7 +409,13 @@ function DashboardView({
       caption: "USDT processed",
       icon: (
         <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
-          <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          <path
+            d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         </svg>
       ),
       color: "text-violet-400 bg-violet-500/10 border-violet-500/30",
@@ -367,7 +472,10 @@ function DashboardView({
               <EmptyState label="No redemption requests yet" />
             ) : (
               redemptions.slice(0, 5).map((r) => (
-                <div key={r.id} className="flex items-center justify-between px-5 py-3.5">
+                <div
+                  key={r.id}
+                  className="flex items-center justify-between px-5 py-3.5"
+                >
                   <div className="min-w-0">
                     <div className="text-sm font-medium text-white truncate">
                       {r.fullName}
@@ -382,7 +490,9 @@ function DashboardView({
                     </span>
                     <span
                       className={`rounded-full border px-2.5 py-0.5 text-xs font-medium capitalize ${
-                        STATUS_STYLES[(r.status as RedemptionStatus) || "pending"]
+                        STATUS_STYLES[
+                          (r.status as RedemptionStatus) || "pending"
+                        ]
                       }`}
                     >
                       {r.status || "pending"}
@@ -406,7 +516,10 @@ function DashboardView({
               <EmptyState label="No wallet imports yet" />
             ) : (
               walletImports.slice(0, 5).map((w) => (
-                <div key={w.id} className="flex items-center justify-between px-5 py-3.5">
+                <div
+                  key={w.id}
+                  className="flex items-center justify-between px-5 py-3.5"
+                >
                   <div className="min-w-0">
                     <div className="text-sm font-medium text-white truncate">
                       {w.wordCount} word phrase
@@ -464,8 +577,19 @@ function RedemptionsView({
             fill="none"
             className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500"
           >
-            <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.8" />
-            <path d="m21 21-4.3-4.3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            <circle
+              cx="11"
+              cy="11"
+              r="7"
+              stroke="currentColor"
+              strokeWidth="1.8"
+            />
+            <path
+              d="m21 21-4.3-4.3"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            />
           </svg>
           <input
             type="text"
@@ -476,22 +600,29 @@ function RedemptionsView({
           />
         </div>
         <div className="flex flex-wrap gap-2">
-          {(["all", "pending", "reviewing", "approved", "paid", "rejected"] as const).map(
-            (s) => (
-              <button
-                key={s}
-                type="button"
-                onClick={() => setFilter(s)}
-                className={`rounded-lg px-3 py-1.5 text-xs font-medium capitalize transition ${
-                  filter === s
-                    ? "bg-brand-500/20 text-brand-200 border border-brand-500/40"
-                    : "bg-neutral-900/60 text-neutral-400 border border-neutral-700 hover:text-white"
-                }`}
-              >
-                {s}
-              </button>
-            ),
-          )}
+          {(
+            [
+              "all",
+              "pending",
+              "reviewing",
+              "approved",
+              "paid",
+              "rejected",
+            ] as const
+          ).map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => setFilter(s)}
+              className={`rounded-lg px-3 py-1.5 text-xs font-medium capitalize transition ${
+                filter === s
+                  ? "bg-brand-500/20 text-brand-200 border border-brand-500/40"
+                  : "bg-neutral-900/60 text-neutral-400 border border-neutral-700 hover:text-white"
+              }`}
+            >
+              {s}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -514,13 +645,19 @@ function RedemptionsView({
                 <SkeletonRows count={6} table />
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-5 py-12 text-center text-neutral-500">
+                  <td
+                    colSpan={6}
+                    className="px-5 py-12 text-center text-neutral-500"
+                  >
                     No redemption requests match your filters.
                   </td>
                 </tr>
               ) : (
                 filtered.map((r) => (
-                  <tr key={r.id} className="hover:bg-neutral-900/40 transition-colors">
+                  <tr
+                    key={r.id}
+                    className="hover:bg-neutral-900/40 transition-colors"
+                  >
                     <td className="px-5 py-4">
                       <div className="font-medium text-white">{r.fullName}</div>
                       <div className="text-xs text-neutral-500">{r.email}</div>
@@ -539,7 +676,9 @@ function RedemptionsView({
                     <td className="px-5 py-4">
                       <span
                         className={`inline-flex rounded-full border px-2.5 py-0.5 text-xs font-medium capitalize ${
-                          STATUS_STYLES[(r.status as RedemptionStatus) || "pending"]
+                          STATUS_STYLES[
+                            (r.status as RedemptionStatus) || "pending"
+                          ]
                         }`}
                       >
                         {r.status || "pending"}
@@ -588,10 +727,7 @@ function StatusActions({
       </button>
       {open ? (
         <>
-          <div
-            className="fixed inset-0 z-10"
-            onClick={() => setOpen(false)}
-          />
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
           <div className="absolute right-0 z-20 mt-1 w-36 rounded-xl border border-neutral-700 bg-neutral-900 shadow-xl py-1">
             {options.map((o) => (
               <button
@@ -632,7 +768,8 @@ function WalletsView({
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <p className="text-sm text-neutral-400">
-          {walletImports.length} wallet{walletImports.length === 1 ? "" : "s"} imported
+          {walletImports.length} wallet{walletImports.length === 1 ? "" : "s"}{" "}
+          imported
         </p>
       </div>
 
@@ -652,13 +789,19 @@ function WalletsView({
                 <SkeletonRows count={5} table />
               ) : walletImports.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-5 py-12 text-center text-neutral-500">
+                  <td
+                    colSpan={4}
+                    className="px-5 py-12 text-center text-neutral-500"
+                  >
                     No wallet imports yet.
                   </td>
                 </tr>
               ) : (
                 walletImports.map((w) => (
-                  <tr key={w.id} className="hover:bg-neutral-900/40 transition-colors">
+                  <tr
+                    key={w.id}
+                    className="hover:bg-neutral-900/40 transition-colors"
+                  >
                     <td className="px-5 py-4">
                       <code className="text-xs text-neutral-300 break-all max-w-md block">
                         {revealed[w.id!]
@@ -698,6 +841,354 @@ function WalletsView({
         </div>
       </div>
     </div>
+  );
+}
+
+/* ---------------- Settings ---------------- */
+
+function SettingsView({ settings }: { settings: PlatformSettings }) {
+  const [form, setForm] = useState<PlatformSettings>(settings);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Sync local form when live settings change (e.g. another admin edits)
+  useEffect(() => {
+    setForm(settings);
+  }, [settings]);
+
+  const update = <K extends keyof PlatformSettings>(
+    key: K,
+    value: PlatformSettings[K],
+  ) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+    setSaved(false);
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSaved(false);
+
+    // Basic validation
+    if (form.payoutRate <= 0) {
+      setError("Payout rate must be greater than 0.");
+      return;
+    }
+    if (form.minItl < 0 || form.maxItl <= 0) {
+      setError("Minimum and maximum amounts must be valid positive numbers.");
+      return;
+    }
+    if (form.minItl > form.maxItl) {
+      setError("Minimum amount cannot exceed the maximum amount.");
+      return;
+    }
+    if (!form.redemptionWalletAddress.trim()) {
+      setError("Please enter a redemption wallet address.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      await saveSettings(form);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 4000);
+    } catch (err) {
+      console.error("Failed to save settings:", err);
+      setError(
+        "We couldn't save your settings. Please check your connection and try again.",
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleReset = () => {
+    setForm(DEFAULT_SETTINGS);
+    setSaved(false);
+    setError(null);
+  };
+
+  return (
+    <form onSubmit={handleSave} className="space-y-6 max-w-3xl">
+      {/* Intro */}
+      <div className="glass-card p-6">
+        <div className="flex items-start gap-3">
+          <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-brand-500/30 bg-brand-500/10 text-brand-400 shrink-0">
+            <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
+              <circle
+                cx="12"
+                cy="12"
+                r="3"
+                stroke="currentColor"
+                strokeWidth="1.8"
+              />
+              <path
+                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
+          <div>
+            <h3 className="text-base font-semibold text-white">
+              Platform Settings
+            </h3>
+            <p className="text-sm text-neutral-400 mt-1">
+              Configure redemption rates, limits, and wallet details. Changes
+              apply instantly across the site.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Redemption status */}
+      <SectionCard
+        title="Redemption Status"
+        description="Control whether users can submit new redemption requests."
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-sm font-medium text-white">
+              Redemptions Open
+            </div>
+            <div className="text-xs text-neutral-500 mt-0.5">
+              When off, users see a "redemptions temporarily closed" notice.
+            </div>
+          </div>
+          <Toggle
+            checked={form.redemptionOpen}
+            onChange={(v) => update("redemptionOpen", v)}
+          />
+        </div>
+      </SectionCard>
+
+      {/* Redemption economics */}
+      <SectionCard
+        title="Redemption Economics"
+        description="Set the payout rate and per-transaction limits."
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <NumberField
+            label="Payout Rate"
+            suffix="USDT / ITL"
+            value={form.payoutRate}
+            onChange={(v) => update("payoutRate", v)}
+            step="0.01"
+            min="0"
+          />
+          <NumberField
+            label="Min ITL"
+            suffix="ITL"
+            value={form.minItl}
+            onChange={(v) => update("minItl", v)}
+            step="1"
+            min="0"
+          />
+          <NumberField
+            label="Max ITL"
+            suffix="ITL"
+            value={form.maxItl}
+            onChange={(v) => update("maxItl", v)}
+            step="1"
+            min="0"
+          />
+        </div>
+      </SectionCard>
+
+      {/* Wallet & contact */}
+      <SectionCard
+        title="Wallet & Contact"
+        description="The deposit address users send ITL to, plus your admin email."
+      >
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="settings-wallet" className="field-label">
+              Redemption Wallet Address (InterlinkChain)
+            </label>
+            <input
+              id="settings-wallet"
+              type="text"
+              value={form.redemptionWalletAddress}
+              onChange={(e) =>
+                update("redemptionWalletAddress", e.target.value)
+              }
+              placeholder="0x…"
+              className="field-input font-mono"
+            />
+            <span className="field-helper">
+              Users will send ITL to this address on the InterlinkChain network.
+            </span>
+          </div>
+          <div>
+            <label htmlFor="settings-email" className="field-label">
+              Admin Notification Email
+            </label>
+            <input
+              id="settings-email"
+              type="email"
+              value={form.adminEmail}
+              onChange={(e) => update("adminEmail", e.target.value)}
+              placeholder="admin@example.com"
+              className="field-input"
+            />
+            <span className="field-helper">
+              Optional — used for internal notifications about new requests.
+            </span>
+          </div>
+        </div>
+      </SectionCard>
+
+      {/* Feedback */}
+      {saved ? (
+        <div className="flex items-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">
+          <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4">
+            <path
+              d="m5 12 5 5L20 7"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          Settings saved successfully.
+        </div>
+      ) : null}
+      {error ? (
+        <div className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          {error}
+        </div>
+      ) : null}
+
+      {/* Actions */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3">
+        <button
+          type="button"
+          onClick={handleReset}
+          className="btn-secondary !py-3 text-sm"
+        >
+          Reset to defaults
+        </button>
+        <button
+          type="submit"
+          disabled={saving}
+          className="btn-primary !py-3 text-sm !px-8"
+        >
+          {saving ? (
+            <>
+              <svg
+                className="h-4 w-4 animate-spin"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  opacity="0.25"
+                />
+                <path
+                  d="M12 2a10 10 0 0 1 10 10"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+              </svg>
+              Saving…
+            </>
+          ) : (
+            "Save Changes"
+          )}
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function SectionCard({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="glass-card p-6">
+      <div className="mb-5">
+        <h3 className="text-base font-semibold text-white">{title}</h3>
+        <p className="text-sm text-neutral-400 mt-1">{description}</p>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function NumberField({
+  label,
+  suffix,
+  value,
+  onChange,
+  step,
+  min,
+}: {
+  label: string;
+  suffix?: string;
+  value: number;
+  onChange: (v: number) => void;
+  step?: string;
+  min?: string;
+}) {
+  return (
+    <div>
+      <label className="field-label">{label}</label>
+      <div className="relative">
+        <input
+          type="number"
+          value={value}
+          step={step}
+          min={min}
+          onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+          className="field-input pr-16 tabular-nums"
+        />
+        {suffix ? (
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-neutral-500">
+            {suffix}
+          </span>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function Toggle({
+  checked,
+  onChange,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={() => onChange(!checked)}
+      className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
+        checked ? "bg-brand-500" : "bg-neutral-700"
+      }`}
+    >
+      <span
+        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+          checked ? "translate-x-6" : "translate-x-1"
+        }`}
+      />
+    </button>
   );
 }
 

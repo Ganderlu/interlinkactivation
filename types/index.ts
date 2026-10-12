@@ -34,3 +34,21 @@ export interface AdminRedemption extends RedemptionRequest {
   id?: string;
   transactionProof?: string;
 }
+
+export interface PlatformSettings {
+  payoutRate: number; // 1 ITL = X USDT
+  minItl: number;
+  maxItl: number;
+  redemptionWalletAddress: string;
+  redemptionOpen: boolean;
+  adminEmail: string;
+}
+
+export const DEFAULT_SETTINGS: PlatformSettings = {
+  payoutRate: 2,
+  minItl: 25,
+  maxItl: 1000,
+  redemptionWalletAddress: "0x1TLcOinXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  redemptionOpen: true,
+  adminEmail: "",
+};
