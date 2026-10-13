@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { RedemptionStep, PlatformSettings } from "@/types";
 import { DEFAULT_SETTINGS } from "@/types";
 import { db } from "@/lib/firebase";
@@ -127,7 +127,7 @@ export default function RedemptionForm({
       setError(null);
       setIsSubmitting(true);
       try {
-        await addDoc(collection(db, "redemptions"), {
+        const docRef = await addDoc(collection(db, "redemptions"), {
           fullName: fullName.trim(),
           email: email.trim(),
           walletAddress: walletAddress.trim(),
@@ -139,6 +139,30 @@ export default function RedemptionForm({
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
         });
+
+        // Notify the admin by email (best-effort; never block the user)
+        try {
+          const notifyRes = await fetch("/api/notify-admin", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id: docRef.id,
+              fullName: fullName.trim(),
+              email: email.trim(),
+              walletAddress: walletAddress.trim(),
+              itlAmount: itlAmount.trim(),
+              usdtPayout,
+              transactionProof: proofFile,
+            }),
+          });
+          if (!notifyRes.ok) {
+            const err = await notifyRes.json().catch(() => ({}));
+            console.error("Admin notification failed:", err);
+          }
+        } catch (notifyErr) {
+          console.error("Admin notification failed:", notifyErr);
+        }
+
         setIsSubmitted(true);
       } catch (err) {
         console.error("Failed to save redemption request:", err);
@@ -619,6 +643,12 @@ function StepSend({
 }) {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const openFilePicker = () => {
+    if (uploading) return;
+    fileInputRef.current?.click();
+  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -638,21 +668,41 @@ function StepSend({
     setUploading(true);
 
     try {
-      const formData = new FormData();
-      formData.append("file", file);
+      // Unsigned Cloudinary upload (uses only cloud name + upload preset,
+      // no API secret required). Configure via NEXT_PUBLIC_CLOUDINARY_* env vars.
+      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+      const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Upload failed.");
+      if (!cloudName || !uploadPreset) {
+        throw new Error("Upload is not configured. Please contact support.");
       }
 
-      setProofFile(data.url);
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", uploadPreset);
+
+      const res = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
+
+      let data: { secure_url?: string; error?: { message?: string } } = {};
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error("Upload service is unavailable. Please try again.");
+      }
+
+      if (!res.ok || !data.secure_url) {
+        throw new Error(
+          data.error?.message || "Upload failed. Please try again.",
+        );
+      }
+
+      setProofFile(data.secure_url);
     } catch (err) {
       console.error("Upload error:", err);
       setUploadError(
@@ -693,7 +743,10 @@ function StepSend({
       </div>
       <div>
         <label className="field-label">Upload proof of transaction</label>
-        <div className="mt-1 border-2 border-dashed border-neutral-700 hover:border-brand-500/70 rounded-xl p-6 text-center transition cursor-pointer active:scale-[0.99]">
+        <div
+          onClick={openFilePicker}
+          className="mt-1 border-2 border-dashed border-neutral-700 hover:border-brand-500/70 rounded-xl p-6 text-center transition cursor-pointer active:scale-[0.99]"
+        >
           {uploading ? (
             <div className="flex flex-col items-center gap-2">
               <svg
@@ -772,6 +825,7 @@ function StepSend({
             </>
           )}
           <input
+            ref={fileInputRef}
             type="file"
             accept="image/png,image/jpeg,image/webp"
             className="hidden"

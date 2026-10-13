@@ -19,7 +19,7 @@ export default function WalletHeader() {
             type="button"
             className="rounded-full px-4 py-1.5 text-sm font-medium text-white/80 active:scale-95 transition-transform"
           >
-            App
+            Mine
           </button>
           <button
             type="button"

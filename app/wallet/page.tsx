@@ -28,7 +28,7 @@ export default function WalletPage() {
         <WalletHeader />
         <WalletSelector />
         <TotalBalance />
-        <QuickActions />
+        <QuickActions onAction={(label) => setActiveSheet(label)} />
         <PredictBTCCard />
         <TokenList />
         <BusinessVaults />

