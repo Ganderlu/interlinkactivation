@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { onSettingsChange } from "@/lib/settings";
 import { DEFAULT_SETTINGS, type PlatformSettings } from "@/types";
+import LanguageSelector from "./LanguageSelector";
 
 function CoinIcon() {
   return (
@@ -86,9 +87,10 @@ export default function Header() {
               <LiveDot open={settings.redemptionOpen} />
               <span className="font-medium text-neutral-200">{rateLabel}</span>
             </div>
+            <LanguageSelector />
             <a
               href="#redeem"
-              className="btn-primary !px-4 sm:!px-5 !py-2.5 text-sm !font-semibold"
+              className="hidden md:inline-flex btn-primary !px-4 sm:!px-5 !py-2.5 text-sm !font-semibold"
             >
               Redeem ITL
             </a>
@@ -144,6 +146,9 @@ export default function Header() {
             <span className="text-sm font-medium text-neutral-200">
               {rateLabel}
             </span>
+          </div>
+          <div className="mt-2 px-1">
+            <LanguageSelector compact />
           </div>
         </nav>
       </div>

@@ -48,7 +48,7 @@ export default function WalletBottomSheet({
         <div className="mx-auto mb-6 h-1.5 w-12 rounded-full bg-neutral-300" />
         <h2 className="text-2xl font-extrabold text-neutral-900">{title}</h2>
         <p className="mt-3 text-base leading-7 text-neutral-500">
-          Connect a valid wallet to use the {title} feature.
+          Activate a valid wallet to continue and access the {title} feature.
         </p>
         <button
           type="button"

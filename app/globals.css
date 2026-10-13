@@ -70,3 +70,77 @@ body {
     @apply inline-block text-[11px] md:text-xs font-semibold uppercase tracking-[0.25em] text-brand-400;
   }
 }
+
+/* ===== Google Translate widget: hide default UI, keep only translation engine ===== */
+/* The top blue banner bar (Google's obfuscated class names + skiptranslate) */
+iframe.skiptranslate,
+.goog-te-banner-frame,
+.goog-te-banner-frame.skiptranslate,
+iframe[id*="container"] {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  width: 0 !important;
+  border: 0 !important;
+}
+/* Google wraps the page in a container with a top offset equal to the banner height */
+body {
+  top: 0 !important;
+  margin-top: 0 !important;
+}
+/* The "Suggest better translation" popup bubble */
+.goog-tooltip,
+.goog-tooltip:hover {
+  display: none !important;
+}
+.goog-text-highlight {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+/* Hide the original dropdown element rendered by the widget (we use our own) */
+#google_translate_element {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+}
+#google_translate_element .goog-te-combo,
+#google_translate_element select {
+  display: none !important;
+}
+/* Remove any inline height Google forces on html/body */
+html.goog-te-banner-active {
+  margin-top: 0 !important;
+}
+
+/* RTL support for right-to-left languages (Arabic, Hebrew, Persian, Urdu) */
+html[dir="rtl"] body {
+  direction: rtl;
+}
+html[dir="rtl"] .rtl-flip {
+  transform: scaleX(-1);
+}
+
+/* Smooth language-switch loading overlay */
+.lang-switch-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(5, 5, 8, 0.7);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.lang-switch-overlay.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
