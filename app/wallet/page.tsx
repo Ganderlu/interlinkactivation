@@ -10,10 +10,11 @@ import TokenList from "@/components/wallet/TokenList";
 import BusinessVaults from "@/components/wallet/BusinessVaults";
 import BottomNav from "@/components/wallet/BottomNav";
 import WalletBottomSheet from "@/components/wallet/WalletBottomSheet";
+import AppTabContent from "@/components/wallet/AppTabContent";
 
 export default function WalletPage() {
   const [activeSheet, setActiveSheet] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<WalletTab>("app");
+  const [activeTab, setActiveTab] = useState<WalletTab>("wallet");
 
   const handleSelect = (key: string, label: string) => {
     if (key === "home") {
@@ -25,29 +26,30 @@ export default function WalletPage() {
 
   const handleTabChange = (tab: WalletTab) => {
     setActiveTab(tab);
-    if (tab === "wallet") {
-      setActiveSheet("Wallet");
-    } else {
-      setActiveSheet(null);
-    }
+    setActiveSheet(null);
   };
 
   const handleSheetClose = () => {
     setActiveSheet(null);
-    setActiveTab("app");
   };
 
   return (
     <div className="min-h-screen w-full bg-[#D8D0F0] py-0 sm:py-10">
       <div className="mx-auto w-full max-w-[420px] overflow-hidden bg-cta-gradient shadow-2xl sm:rounded-[2.5rem] sm:ring-1 sm:ring-black/5">
         <WalletHeader activeTab={activeTab} onTabChange={handleTabChange} />
-        <WalletSelector />
-        <TotalBalance />
-        <QuickActions onAction={(label) => setActiveSheet(label)} />
-        <PredictBTCCard />
-        <TokenList />
-        <BusinessVaults />
-        <div className="h-40 bg-cta-gradient" />
+        {activeTab === "wallet" ? (
+          <>
+            <WalletSelector />
+            <TotalBalance />
+            <QuickActions onAction={(label) => setActiveSheet(label)} />
+            <PredictBTCCard />
+            <TokenList />
+            <BusinessVaults />
+            <div className="h-40 bg-cta-gradient" />
+          </>
+        ) : (
+          <AppTabContent />
+        )}
       </div>
       <BottomNav onSelect={handleSelect} />
       <WalletBottomSheet
