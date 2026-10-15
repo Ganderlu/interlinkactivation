@@ -28,14 +28,17 @@ const stats: StatItem[] = [
 
 export default function StatsRow() {
   return (
-    <section id="stats" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20">
+    <section
+      id="stats"
+      className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20"
+    >
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {stats.map((s) => (
           <div
             key={s.label}
             className="glass-card p-6 transition-all duration-300 hover:border-brand-600/50 hover:-translate-y-0.5"
           >
-            <div className="text-xs sm:text-sm font-medium text-neutral-400 uppercase tracking-wider">
+            <div className="text-xs sm:text-sm font-medium text-neutral-500 uppercase tracking-wider">
               {s.label}
             </div>
             <div className="mt-3 flex items-baseline gap-1.5 flex-wrap">
@@ -43,13 +46,13 @@ export default function StatsRow() {
                 className={
                   s.highlight
                     ? "text-2xl sm:text-3xl font-bold bg-brand-gradient bg-clip-text text-transparent"
-                    : "text-2xl sm:text-3xl font-bold text-white"
+                    : "text-2xl sm:text-3xl font-bold text-black"
                 }
               >
                 {s.value}
               </span>
               {s.suffix ? (
-                <span className="text-sm sm:text-base font-semibold text-neutral-300">
+                <span className="text-sm sm:text-base font-semibold text-neutral-700">
                   {s.suffix}
                 </span>
               ) : null}

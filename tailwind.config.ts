@@ -32,13 +32,18 @@ export default {
         "brand-gradient":
           "linear-gradient(90deg, #6d28d9 0%, #8b5cf6 50%, #a78bfa 100%)",
         "hero-glow":
-          "radial-gradient(ellipse 80% 50% at 50% -20%, rgba(139,92,246,0.25), transparent 60%)",
+          "radial-gradient(ellipse 80% 50% at 50% -20%, rgba(139,92,246,0.18), transparent 60%)",
         "cta-gradient":
           "linear-gradient(135deg, #6d28d9 0%, #8b5cf6 50%, #a78bfa 100%)",
+        "mining-grid":
+          "linear-gradient(rgba(124,58,237,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(124,58,237,0.04) 1px, transparent 1px)",
+      },
+      backgroundSize: {
+        "mining-grid": "48px 48px",
       },
       boxShadow: {
-        glow: "0 0 40px -10px rgba(139, 92, 246, 0.45)",
-        "glow-strong": "0 0 60px 0 rgba(139, 92, 246, 0.55)",
+        glow: "0 0 30px -8px rgba(139, 92, 246, 0.4)",
+        "glow-strong": "0 0 50px 0 rgba(139, 92, 246, 0.5)",
       },
       animation: {
         "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",

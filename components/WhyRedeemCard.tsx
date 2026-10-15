@@ -38,16 +38,16 @@ const benefits = [
 export default function WhyRedeemCard() {
   return (
     <div className="glass-card p-5 sm:p-6">
-      <div className="text-sm font-semibold text-neutral-100 text-center">
+      <div className="text-sm font-semibold text-brand-900 text-center">
         Why redeem with us
       </div>
       <ul className="mt-5 space-y-4">
         {benefits.map((b) => (
           <li key={b.title} className="flex items-start gap-3">
-            <span className="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-brand-500/30 bg-brand-500/10 text-brand-300">
+            <span className="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-brand-200 bg-brand-50 text-brand-600">
               {b.icon}
             </span>
-            <span className="text-sm leading-6 text-neutral-300 pt-1.5">
+            <span className="text-sm leading-6 text-brand-700 pt-1.5">
               {b.title}
             </span>
           </li>

@@ -209,17 +209,19 @@ export default function RedemptionForm({
               />
             </svg>
           </div>
-          <h3 className="mt-5 text-2xl font-bold text-white">
+          <h3 className="mt-5 text-2xl font-bold text-brand-900">
             Request submitted
           </h3>
-          <p className="mt-3 text-sm leading-7 text-neutral-400 max-w-md mx-auto">
+          <p className="mt-3 text-sm leading-7 text-brand-600 max-w-md mx-auto">
             Thank you, {fullName.split(" ")[0] || "there"}! Your redemption
             request has been saved successfully. Our team will review your
             transfer and send your{" "}
-            <span className="text-white font-semibold">{usdtPayout} USDT</span>{" "}
+            <span className="text-brand-900 font-semibold">
+              {usdtPayout} USDT
+            </span>{" "}
             payout to your BEP-20 wallet shortly.
           </p>
-          <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm font-medium text-emerald-300">
+          <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm font-medium text-emerald-700">
             <span className="relative inline-flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
@@ -257,10 +259,10 @@ export default function RedemptionForm({
               />
             </svg>
           </div>
-          <h3 className="mt-5 text-2xl font-bold text-white">
+          <h3 className="mt-5 text-2xl font-bold text-brand-900">
             Redemptions temporarily closed
           </h3>
-          <p className="mt-3 text-sm leading-7 text-neutral-400 max-w-md">
+          <p className="mt-3 text-sm leading-7 text-brand-600 max-w-md">
             We're currently reviewing our redemption schedule. Please check back
             soon — we'll reopen as quickly as possible.
           </p>
@@ -276,8 +278,8 @@ export default function RedemptionForm({
               const circleClass = isActive
                 ? "bg-cta-gradient text-white shadow-glow border-transparent"
                 : isDone
-                  ? "bg-brand-600/20 text-brand-300 border-brand-500/40"
-                  : "bg-neutral-900 text-neutral-500 border-neutral-700";
+                  ? "bg-brand-100 text-brand-700 border-brand-300"
+                  : "bg-brand-50 text-brand-400 border-brand-200";
               return (
                 <li key={s} className="relative flex-1 last:flex-none">
                   <div className="flex flex-col items-center gap-2 w-full">
@@ -309,7 +311,7 @@ export default function RedemptionForm({
                     </div>
                   </div>
                   {idx < STEPS.length - 1 ? (
-                    <div className="absolute top-4 left-1/2 w-full h-[2px] bg-neutral-800">
+                    <div className="absolute top-4 left-1/2 w-full h-[2px] bg-brand-100">
                       <div
                         className="h-full bg-brand-gradient transition-all duration-300"
                         style={{
@@ -358,7 +360,7 @@ export default function RedemptionForm({
           )}
 
           {stepError ? (
-            <div className="mt-6 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-200 flex items-start gap-2">
+            <div className="mt-6 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-700 flex items-start gap-2">
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
@@ -377,7 +379,7 @@ export default function RedemptionForm({
           ) : null}
 
           {error ? (
-            <div className="mt-6 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+            <div className="mt-6 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-700">
               {error}
             </div>
           ) : null}
@@ -486,7 +488,7 @@ function StepAmount({
       <div>
         <label
           htmlFor="itl-amount"
-          className="block text-base font-semibold text-neutral-200 mb-3"
+          className="block text-base font-semibold text-brand-900 mb-3"
         >
           ITL amount to redeem
         </label>
@@ -502,26 +504,26 @@ function StepAmount({
             value={itlAmount}
             onChange={(e) => setItlAmount(e.target.value)}
             placeholder="0.00"
-            className="w-full rounded-2xl border border-neutral-700 bg-neutral-900/80 px-5 py-5 pr-20 text-2xl font-bold text-white placeholder:text-neutral-600 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30 outline-none transition tabular-nums"
+            className="w-full rounded-2xl border border-brand-200 bg-white px-5 py-5 pr-20 text-2xl font-bold text-brand-900 placeholder:text-brand-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition tabular-nums"
           />
-          <span className="absolute right-4 top-1/2 -translate-y-1/2 rounded-xl bg-brand-500/15 border border-brand-500/30 px-3 py-1.5 text-sm font-semibold text-brand-300">
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 rounded-xl bg-brand-50 border border-brand-200 px-3 py-1.5 text-sm font-semibold text-brand-700">
             ITL
           </span>
         </div>
       </div>
 
       {/* You'll receive box */}
-      <div className="flex items-center justify-between rounded-2xl border border-brand-500/30 bg-brand-900/20 px-5 py-5">
-        <span className="text-lg font-semibold text-neutral-300">
+      <div className="flex items-center justify-between rounded-2xl border border-brand-200 bg-brand-50/60 px-5 py-5">
+        <span className="text-lg font-semibold text-brand-700">
           You'll receive
         </span>
-        <span className="text-2xl font-extrabold text-white tabular-nums">
+        <span className="text-2xl font-extrabold text-brand-900 tabular-nums">
           {usdtPayout} USDT
         </span>
       </div>
 
       {/* Helper text */}
-      <p className="text-sm leading-6 text-neutral-500">
+      <p className="text-sm leading-6 text-brand-500">
         Min {minItl} ITL, max {maxItl} ITL per transaction. Paid out in USDT on
         the BNB Smart Chain (BEP-20) network.
       </p>
@@ -721,10 +723,10 @@ function StepSend({
 
   return (
     <div className="space-y-5">
-      <div className="glass-card p-5 bg-neutral-950/60 space-y-3">
-        <div className="text-sm text-neutral-400">Redemption address</div>
+      <div className="glass-card p-5 bg-white/90 space-y-3">
+        <div className="text-sm text-brand-600">Redemption address</div>
         <div className="flex items-center gap-3">
-          <code className="flex-1 text-sm text-white bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-2 break-all">
+          <code className="flex-1 text-sm text-brand-900 bg-brand-50 border border-brand-100 rounded-lg px-3 py-2 break-all">
             {redemptionWalletAddress}
           </code>
           <button
@@ -737,7 +739,7 @@ function StepSend({
             Copy
           </button>
         </div>
-        <div className="text-xs text-neutral-500">
+        <div className="text-xs text-brand-500">
           Send only ITL on InterlinkChain to this address.
         </div>
       </div>
@@ -745,7 +747,7 @@ function StepSend({
         <label className="field-label">Upload proof of transaction</label>
         <div
           onClick={openFilePicker}
-          className="mt-1 border-2 border-dashed border-neutral-700 hover:border-brand-500/70 rounded-xl p-6 text-center transition cursor-pointer active:scale-[0.99]"
+          className="mt-1 border-2 border-dashed border-brand-200 hover:border-brand-400 rounded-xl p-6 text-center transition cursor-pointer active:scale-[0.99]"
         >
           {uploading ? (
             <div className="flex flex-col items-center gap-2">
@@ -769,16 +771,16 @@ function StepSend({
                   strokeLinecap="round"
                 />
               </svg>
-              <div className="text-sm text-neutral-200">Uploading…</div>
+              <div className="text-sm text-brand-700">Uploading…</div>
             </div>
           ) : isUrl ? (
             <div className="space-y-3">
               <img
                 src={proofFile}
                 alt="Transaction proof"
-                className="mx-auto max-h-48 rounded-lg border border-neutral-700"
+                className="mx-auto max-h-48 rounded-lg border border-brand-100"
               />
-              <div className="text-sm text-emerald-300 flex items-center justify-center gap-1.5">
+              <div className="text-sm text-emerald-600 flex items-center justify-center gap-1.5">
                 <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4">
                   <path
                     d="m5 12 5 5L20 7"
@@ -796,7 +798,7 @@ function StepSend({
                   e.stopPropagation();
                   setProofFile("");
                 }}
-                className="text-xs text-neutral-400 hover:text-red-300 transition"
+                className="text-xs text-brand-500 hover:text-red-500 transition"
               >
                 Remove
               </button>
@@ -806,7 +808,7 @@ function StepSend({
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
-                className="h-8 w-8 mx-auto text-brand-400 mb-2"
+                className="h-8 w-8 mx-auto text-brand-500 mb-2"
               >
                 <path
                   d="M12 16V4m0 0-4 4m4-4 4 4M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"
@@ -816,10 +818,10 @@ function StepSend({
                   strokeLinejoin="round"
                 />
               </svg>
-              <div className="text-sm text-neutral-200">
+              <div className="text-sm text-brand-700">
                 Click to upload a screenshot
               </div>
-              <div className="text-xs text-neutral-500 mt-1">
+              <div className="text-xs text-brand-400 mt-1">
                 PNG, JPG, WEBP up to 5MB
               </div>
             </>
@@ -834,7 +836,7 @@ function StepSend({
           />
         </div>
         {uploadError ? (
-          <p className="mt-2 text-xs text-red-400">{uploadError}</p>
+          <p className="mt-2 text-xs text-red-500">{uploadError}</p>
         ) : null}
       </div>
     </div>
@@ -864,7 +866,7 @@ function StepConfirm({
 
   return (
     <div className="space-y-4">
-      <div className="glass-card p-5 bg-neutral-950/60 divide-y divide-neutral-800">
+      <div className="glass-card p-5 bg-white/90 divide-y divide-brand-100">
         <Row k="ITL to redeem" v={`${itlAmount || "0"} ITL`} />
         <Row k="Payout rate" v="1 ITL = 2 USDT" />
         <Row k="Payout amount" v={`${usdtPayout} USDT`} strong />
@@ -872,31 +874,31 @@ function StepConfirm({
         <Row k="Email" v={email || "—"} />
         <Row k="Wallet (BEP-20)" v={shortWallet} />
         <div className="py-3 first:pt-0 last:pb-0">
-          <span className="text-sm text-neutral-400">Transaction proof</span>
+          <span className="text-sm text-brand-600">Transaction proof</span>
           {proofIsUrl ? (
             <div className="mt-2">
               <img
                 src={proofFile}
                 alt="Transaction proof"
-                className="max-h-40 rounded-lg border border-neutral-700"
+                className="max-h-40 rounded-lg border border-brand-100"
               />
               <a
                 href={proofFile}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-1 inline-block text-xs text-brand-400 hover:text-brand-300 transition"
+                className="mt-1 inline-block text-xs text-brand-600 hover:text-brand-900 transition"
               >
                 View full size
               </a>
             </div>
           ) : (
-            <span className="text-sm font-medium text-neutral-100">
+            <span className="text-sm font-medium text-brand-900">
               {proofFile || "—"}
             </span>
           )}
         </div>
       </div>
-      <p className="text-xs text-neutral-500">
+      <p className="text-xs text-brand-500">
         By clicking Confirm & Submit you confirm the details above and agree to
         our terms. Our team will review your request and send the payout shortly
         after confirmation.
@@ -908,12 +910,12 @@ function StepConfirm({
 function Row({ k, v, strong }: { k: string; v: string; strong?: boolean }) {
   return (
     <div className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
-      <span className="text-sm text-neutral-400">{k}</span>
+      <span className="text-sm text-brand-600">{k}</span>
       <span
         className={
           strong
             ? "text-base font-bold bg-brand-gradient bg-clip-text text-transparent"
-            : "text-sm font-medium text-neutral-100"
+            : "text-sm font-medium text-brand-900"
         }
       >
         {v}

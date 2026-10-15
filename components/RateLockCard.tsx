@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useEffect, useState } from "react";
 
@@ -26,7 +26,7 @@ export default function RateLockCard() {
 
   return (
     <div className="glass-card p-5 sm:p-6 text-center">
-      <div className="text-sm font-semibold text-neutral-100">Payout rate lock</div>
+      <div className="text-sm font-semibold text-black">Payout rate lock</div>
       <p className="mt-1 text-xs text-neutral-500 leading-relaxed">
         Your quoted payout rate is held for a short window before refreshing.
       </p>
@@ -43,7 +43,7 @@ export default function RateLockCard() {
             cx={size / 2}
             cy={size / 2}
             r={radius}
-            stroke="rgba(63, 63, 70, 0.6)"
+            stroke="rgba(196, 181, 253, 0.5)"
             strokeWidth={stroke}
             fill="none"
           />
@@ -63,12 +63,16 @@ export default function RateLockCard() {
             fill="none"
             strokeLinecap="round"
             strokeDasharray={circumference}
-            strokeDashoffset={mounted ? dashOffset : circumference * (1 - INITIAL_DISPLAY / START_SECONDS)}
+            strokeDashoffset={
+              mounted
+                ? dashOffset
+                : circumference * (1 - INITIAL_DISPLAY / START_SECONDS)
+            }
             style={{ transition: "stroke-dashoffset 1s linear" }}
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <div className="text-4xl font-extrabold text-white tabular-nums">
+          <div className="text-4xl font-extrabold text-black tabular-nums">
             {mounted ? secondsLeft : INITIAL_DISPLAY}
           </div>
           <div className="text-[11px] uppercase tracking-widest text-neutral-500">
@@ -77,8 +81,8 @@ export default function RateLockCard() {
         </div>
       </div>
 
-      <div className="inline-flex items-center gap-1.5 rounded-full border border-brand-500/30 bg-brand-500/10 px-3.5 py-1.5 text-sm font-semibold text-brand-200">
-        1 ITL <span className="text-neutral-500">=</span> 2 USDT
+      <div className="inline-flex items-center gap-1.5 rounded-full border border-brand-200 bg-brand-50 px-3.5 py-1.5 text-sm font-semibold text-brand-700">
+        1 ITL <span className="text-brand-400">=</span> 2 USDT
       </div>
     </div>
   );

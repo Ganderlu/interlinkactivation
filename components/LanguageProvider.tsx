@@ -221,9 +221,9 @@ export default function LanguageProvider({
       {children}
       {isSwitching ? (
         <div className="lang-switch-overlay is-visible" role="status" aria-live="polite">
-          <div className="flex flex-col items-center gap-3 text-white">
+          <div className="flex flex-col items-center gap-3 text-brand-900">
             <svg
-              className="h-9 w-9 animate-spin text-brand-400"
+              className="h-9 w-9 animate-spin text-brand-500"
               viewBox="0 0 24 24"
               fill="none"
             >
@@ -242,7 +242,7 @@ export default function LanguageProvider({
                 strokeLinecap="round"
               />
             </svg>
-            <span className="text-sm font-medium text-neutral-200">
+            <span className="text-sm font-medium text-brand-700">
               Translating…
             </span>
           </div>

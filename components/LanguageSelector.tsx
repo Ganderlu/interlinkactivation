@@ -58,9 +58,9 @@ export default function LanguageSelector({
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label="Select language"
-        className="inline-flex items-center gap-1.5 rounded-full border border-neutral-700 bg-neutral-900/60 px-3 py-2 text-sm font-medium text-neutral-200 transition hover:border-brand-500/60 hover:text-white active:scale-95"
+        className="inline-flex items-center gap-1.5 rounded-full border border-brand-200 bg-white/70 px-3 py-2 text-sm font-medium text-brand-700 transition hover:border-brand-400 hover:text-brand-900 active:scale-95"
       >
-        <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4 text-brand-400">
+        <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4 text-brand-500">
           <circle
             cx="12"
             cy="12"
@@ -81,7 +81,7 @@ export default function LanguageSelector({
         <svg
           viewBox="0 0 24 24"
           fill="none"
-          className={`h-3.5 w-3.5 text-neutral-400 transition-transform ${open ? "rotate-180" : ""}`}
+          className={`h-3.5 w-3.5 text-brand-400 transition-transform ${open ? "rotate-180" : ""}`}
         >
           <path
             d="m6 9 6 6 6-6"
@@ -95,8 +95,8 @@ export default function LanguageSelector({
 
       {/* Desktop dropdown (stays relative to the trigger button) */}
       {open ? (
-        <div className="absolute right-0 z-[60] mt-2 w-64 overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-950/95 p-2 shadow-2xl backdrop-blur-xl hidden md:block">
-          <p className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
+        <div className="absolute right-0 z-[60] mt-2 w-64 overflow-hidden rounded-2xl border border-brand-100 bg-white/95 p-2 shadow-2xl backdrop-blur-xl hidden md:block">
+          <p className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-brand-500">
             Choose your language
           </p>
           <div className="max-h-80 overflow-y-auto">
@@ -110,7 +110,7 @@ export default function LanguageSelector({
             ))}
           </div>
           {!isReady ? (
-            <p className="px-3 py-2 text-[11px] text-neutral-600">
+            <p className="px-3 py-2 text-[11px] text-brand-400">
               Loading translator…
             </p>
           ) : null}
@@ -126,9 +126,9 @@ export default function LanguageSelector({
                 className="fixed inset-0 z-[90] bg-black/60 backdrop-blur-sm md:hidden"
                 onClick={() => setOpen(false)}
               />
-              <div className="fixed inset-x-0 bottom-0 z-[91] mx-auto max-w-[420px] max-h-[80vh] overflow-y-auto rounded-t-3xl border-t border-neutral-800 bg-neutral-950 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-2xl md:hidden animate-[slideUp_0.25s_ease-out]">
-                <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-neutral-700" />
-                <p className="px-2 pb-2 text-xs font-semibold uppercase tracking-wider text-neutral-500">
+              <div className="fixed inset-x-0 bottom-0 z-[91] mx-auto max-w-[420px] max-h-[80vh] overflow-y-auto rounded-t-3xl border-t border-brand-100 bg-white p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-2xl md:hidden animate-[slideUp_0.25s_ease-out]">
+                <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-brand-200" />
+                <p className="px-2 pb-2 text-xs font-semibold uppercase tracking-wider text-brand-500">
                   Choose your language
                 </p>
                 <div className="grid grid-cols-2 gap-2">
@@ -176,8 +176,8 @@ function LanguageButton({
       onClick={() => onSelect(lang.code)}
       className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition active:scale-[0.98] ${
         active
-          ? "bg-brand-500/15 text-white ring-1 ring-brand-500/50"
-          : "text-neutral-300 hover:bg-neutral-800/70 hover:text-white"
+          ? "bg-brand-50 text-brand-900 ring-1 ring-brand-300"
+          : "text-brand-700 hover:bg-brand-50 hover:text-brand-900"
       }`}
     >
       <span className="text-lg leading-none">{lang.flag}</span>
