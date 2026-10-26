@@ -37,6 +37,45 @@ export const LANGUAGES: LanguageOption[] = [
   { code: "tr", label: "Türkçe", flag: "🇹🇷" },
   { code: "id", label: "Bahasa Indonesia", flag: "🇮🇩" },
   { code: "nl", label: "Nederlands", flag: "🇳🇱" },
+  // --- Extended set ---
+  { code: "sv", label: "Svenska", flag: "🇸🇪" },
+  { code: "da", label: "Dansk", flag: "🇩🇰" },
+  { code: "no", label: "Norsk", flag: "🇳🇴" },
+  { code: "fi", label: "Suomi", flag: "🇫🇮" },
+  { code: "pl", label: "Polski", flag: "🇵🇱" },
+  { code: "cs", label: "Čeština", flag: "🇨🇿" },
+  { code: "sk", label: "Slovenčina", flag: "🇸🇰" },
+  { code: "hu", label: "Magyar", flag: "🇭🇺" },
+  { code: "ro", label: "Română", flag: "🇷🇴" },
+  { code: "bg", label: "Български", flag: "🇧🇬" },
+  { code: "el", label: "Ελληνικά", flag: "🇬🇷" },
+  { code: "uk", label: "Українська", flag: "🇺🇦" },
+  { code: "iw", label: "עברית", flag: "🇮🇱", rtl: true },
+  { code: "fa", label: "فارسی", flag: "🇮🇷", rtl: true },
+  { code: "ur", label: "اردو", flag: "🇵🇰", rtl: true },
+  { code: "th", label: "ไทย", flag: "🇹🇭" },
+  { code: "vi", label: "Tiếng Việt", flag: "🇻🇳" },
+  { code: "ms", label: "Bahasa Melayu", flag: "🇲🇾" },
+  { code: "tl", label: "Filipino", flag: "🇵🇭" },
+  { code: "bn", label: "বাংলা", flag: "🇧🇩" },
+  { code: "ta", label: "தமிழ்", flag: "🇮🇳" },
+  { code: "te", label: "తెలుగు", flag: "🇮🇳" },
+  { code: "mr", label: "मराठी", flag: "🇮🇳" },
+  { code: "gu", label: "ગુજરાતી", flag: "🇮🇳" },
+  { code: "sw", label: "Kiswahili", flag: "🇰🇪" },
+  { code: "ha", label: "Hausa", flag: "🇳🇬" },
+  { code: "yo", label: "Yorùbá", flag: "🇳🇬" },
+  { code: "ig", label: "Igbo", flag: "🇳🇬" },
+  { code: "af", label: "Afrikaans", flag: "🇿🇦" },
+  { code: "sr", label: "Српски", flag: "🇷🇸" },
+  { code: "hr", label: "Hrvatski", flag: "🇭🇷" },
+  { code: "lt", label: "Lietuvių", flag: "🇱🇹" },
+  { code: "lv", label: "Latviešu", flag: "🇱🇻" },
+  { code: "et", label: "Eesti", flag: "🇪🇪" },
+  { code: "sl", label: "Slovenščina", flag: "🇸🇮" },
+  { code: "ca", label: "Català", flag: "🇦🇩" },
+  { code: "am", label: "አማርኛ", flag: "🇪🇹" },
+  { code: "zu", label: "isiZulu", flag: "🇿🇦" },
 ];
 
 const STORAGE_KEY = "itl_lang";
@@ -176,12 +215,14 @@ export default function LanguageProvider({
     const combo = document.querySelector<HTMLSelectElement>(
       "#google_translate_element select.goog-te-combo",
     );
-    if (combo) {
-      combo.value = lang;
-      combo.dispatchEvent(new Event("change"));
-      return true;
-    }
-    return false;
+    if (!combo) return false;
+    // Only drive the combo when the widget actually exposes this language.
+    // Otherwise fall back to a full reload (cookie-based translation).
+    const hasOption = Array.from(combo.options).some((o) => o.value === lang);
+    if (!hasOption) return false;
+    combo.value = lang;
+    combo.dispatchEvent(new Event("change"));
+    return true;
   }, []);
 
   const setLanguage = useCallback(
@@ -220,7 +261,11 @@ export default function LanguageProvider({
       <div id="google_translate_element" aria-hidden="true" />
       {children}
       {isSwitching ? (
-        <div className="lang-switch-overlay is-visible" role="status" aria-live="polite">
+        <div
+          className="lang-switch-overlay is-visible"
+          role="status"
+          aria-live="polite"
+        >
           <div className="flex flex-col items-center gap-3 text-brand-900">
             <svg
               className="h-9 w-9 animate-spin text-brand-500"

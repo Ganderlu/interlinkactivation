@@ -31,8 +31,8 @@ const actions = [
     badge: null,
   },
   {
-    key: "exchange",
-    label: "Exchange",
+    key: "activate",
+    label: "Activate",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
         <path d="M7 7h13l-3-3M17 17H4l3 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />

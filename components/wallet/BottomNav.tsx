@@ -38,8 +38,8 @@ const items = [
     ),
   },
   {
-    key: "exchange",
-    label: "Exchange",
+    key: "activate",
+    label: "Activate",
     active: true,
     fab: true,
     icon: () => (
